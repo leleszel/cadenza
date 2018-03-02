@@ -11,6 +11,8 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
 
 
         //give scope its initial values
+        $scope.emptyQuery = true;
+        $scope.searchMessage = "";
         $scope.access_token = param.access_token;
         $scope.refresh_token = param.refresh_token;
         $scope.track_data = [];
@@ -72,11 +74,11 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                     InfoObject.name = trackObj.name;
                     InfoObject.first_artist = trackObj.artists[0].name;
                     InfoObject.imageurl = trackObj.album.images[0].url;
-                    if (InfoObject.name.length > 21){
-                        InfoObject.name = InfoObject.name.substr(0, 21) + "...";
+                    if (InfoObject.name.length > 17){
+                        InfoObject.name = InfoObject.name.substr(0, 17) + "...";
                     }
-                    if(InfoObject.first_artist.length > 21)
-                        InfoObject.first_artist = trackObj.artists[0].name.substr(0,21)+"...";
+                    if(InfoObject.first_artist.length > 17)
+                        InfoObject.first_artist = trackObj.artists[0].name.substr(0,17)+"...";
                     InfoObject.isHidden = false;
                     $scope.track_data.push(InfoObject);
                     localStorageService.set('track_data',$scope.track_data);
@@ -223,6 +225,8 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
         };
 
         $scope.searchForWord = function(word){
+            $scope.emptyQuery = word === "";
+            $scope.searchMessage = word;
             $scope.track_data.forEach(function(track_data_element){
                var particular_track = $scope.tracks.find(function(elt){
                    return track_data_element.uri === elt.track.uri;
@@ -365,7 +369,6 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
 
 
 }]);
-
 
 
 

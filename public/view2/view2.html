@@ -1,10 +1,10 @@
 <header>
-    <a href="#!/view2" class="ml4">Web App Name</a>
+    <a href="#!/view2" class="ml4">cadenza</a>
 </header>
 
 <div ng-app="frontApp.view2" ng-controller="AppController as appCtrl" id="home">
     <div ng-init="databaseLogin()"></div>
-    <h1 class="b">Hello, {{display_name}}.</h1>
+    <h1 class="b front">Hello, {{display_name}}.</h1>
 <!--
     <p class ="overflow-ellipsis">Your access token:{{access_token}}</p>
     <p class ="overflow-ellipsis">Your refresh token:{{refresh_token}}</p>
@@ -19,8 +19,10 @@
             </word-cloud>
     </div>
 
-    <input type="text" ng-model="wordQuery" class="search-songs" placeholder="Search through your previous notes">
-    <button ng-click="searchForWord(wordQuery)" class="search-button">SEARCH</button>
+    <input type="text" ng-model="wordQuery" class="search-songs" ng-keyup="$event.keyCode == 13 && searchForWord(wordQuery)" placeholder="Search through your previous notes">
+    <div ng-click="searchForWord(wordQuery)" class="search-button">
+        <i class="fa fa-arrow-circle-o-right"></i>
+    </div>
 <!--
     <iframe id='myplayer' src='https://open.spotify.com/embed?uri=spotify:track:5SE57ljOIUJ1ybL9U6CuBH' frameborder='0' allowtransparency='true'></iframe>
     <br/>
@@ -29,11 +31,12 @@
 
     <h3>YOUR SONGS - <a class="togglesongs" onclick="toggleYourSongs('yoursongs', 'songs-button')"><i class="fa fa-2x fa-chevron-down toggle-button" id="songs-button"></i></a></h3>
     <div class="container" id="yoursongs">
+        <p ng-if="!emptyQuery">Your songs with {{searchMessage}}</p>
         <div class="row">
             <div class="col-md-3" ng-repeat="x in track_data" ng-if="!x.isHidden">
                 <div class="song-card" id="song-card">
                     <a ng-href="{{x.redirect}}">
-                        <img id="track image" ng-src="{{x.imageurl}}">
+                        <img id="track image" class="song-img" ng-src="{{x.imageurl}}">
                         <h3>{{x.name}}</h3>
                     </a>
                     <p>{{x.first_artist}}</p>
