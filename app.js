@@ -18,7 +18,7 @@ var methodOverride = require('method-override');
 
 var client_id = '626fb1f9e4c14a5897b43fd1e674b186'; // Your client id
 var client_secret = '6a2692aed01c4330955285e003dd2e1c'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+var redirect_uri = 'http://159.65.100.11/callback'; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -168,4 +168,4 @@ db.once('open', function() {
 
 
 console.log('Listening on 8888');
-app.listen(8888);
+app.listen(80, '0.0.0.0');
