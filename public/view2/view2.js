@@ -19,6 +19,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
         $scope.playlist_builder = [];
         $scope.all_playlist_data = [];
         $scope.offset = 0;
+        $scope.more_playlists_button = true;
         if ($scope.access_token) {
             localStorageService.set('access_token', $scope.access_token);
             localStorageService.set('refresh_token', $scope.refresh_token);
@@ -34,10 +35,10 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
 
 
         $scope.$on('word_clicked',function(event,arg){
-            console.log("red alert");
+            //console.log("red alert");
             if(arg && !$scope.playlist_builder.includes(arg))
                 $scope.playlist_builder.push(arg);
-            console.log($scope.playlist_builder);
+            //console.log($scope.playlist_builder);
             $scope.$apply();
         });
 
@@ -83,7 +84,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                     $scope.track_data.push(InfoObject);
                     localStorageService.set('track_data',$scope.track_data);
                 },function(error){
-                    console.log("error occured:" +error.toString());
+                    //console.log("error occured:" +error.toString());
 
                 });
             });
@@ -97,13 +98,13 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                 }
             };
 
-            console.log("Attempting to retrieve user info from spotify");
+            //console.log("Attempting to retrieve user info from spotify");
             $http.get('https://api.spotify.com/v1/me', config)
                 .then(function success(response) {
                     $scope.display_name = response.data.display_name;
                     $scope.userid = response.data.id;
 
-                    console.log("Attempting to log into database");
+                    //console.log("Attempting to log into database");
 
                     var dbconfig = {
                         params: {
@@ -122,14 +123,14 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                     });
 
                 }, function error(response) {
-                    console.log("error occured while logging in to spotify");
+                    //console.log("error occured while logging in to spotify");
                 });
 
         };
 
         //add track from front end to back end.
         $scope.addTrack = function () {
-            console.log("requesting add_new_track from front end");
+            //console.log("requesting add_new_track from front end");
 
             var url = "https://api.spotify.com/v1/tracks/" + $scope.newTrack.substring("spotify:track:".length);
 
@@ -152,7 +153,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                     .then(function success(response){
                         $scope.form_feedback = "Track addition successful.";
                         if($scope.tracks == response.data.tracklist){
-                            console.log("Track is already in database. Continuing execution");
+                            //console.log("Track is already in database. Continuing execution");
                             return;
                         }
                         $scope.tracks=response.data.trackList;
@@ -166,7 +167,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
 
             },function(error){
                 $scope.form_feedback = "Error in obtaining track from Spotify. Input must be valid URI";
-                console.log("error occured:" +error.toString());
+                //console.log("error occured:" +error.toString());
 
             });
 
@@ -174,7 +175,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
 
         //add word from front end to back end
         $scope.addWord = function () {
-            console.log("requesting to add new word from front end");
+            //console.log("requesting to add new word from front end");
             var data = {
                 username: $scope.display_name,
                 userID: $scope.userid,
@@ -187,7 +188,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                 .then(function success(response) {
                     $scope.tracks = response.data.trackList;
                 }, function error(response) {
-                    console.log("error occurred in associating word");
+                    //console.log("error occurred in associating word");
                 });
         };
 
@@ -208,25 +209,35 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
 
             $http.get(url, config).then(function (response) {
                 var playlists = response.data;
+                var prev_length = $scope.all_playlist_data.length;
                 $scope.all_playlist_data=$scope.all_playlist_data.concat(playlists.items);
+                if(prev_length == $scope.all_playlist_data.length){
+                    $scope.more_playlists_button = false;
+                }
                 $scope.all_playlist_data.forEach(function(element)
                 {
                     if (element.name.length > 18){
                         element.name = element.name.substr(0, 18) + "...";
                     }                       
                 });
-                console.log($scope.all_playlist_data);
+                //console.log($scope.all_playlist_data);
                 for(var i = 0; i < $scope.all_playlist_data.length;i++)
                     $scope.all_playlist_data[i].redirect_uri = "#!/view4#playlistid="+encodeURI($scope.all_playlist_data[i].id);
             },function error(response){
-                console.log("error occurred in retrieving playlists");
+                //console.log("error occurred in retrieving playlists");
             });
 
         };
 
         $scope.searchForWord = function(word){
-            $scope.emptyQuery = word === "";
-            $scope.searchMessage = word;
+            $scope.emptyQuery = word == "";
+            //console.log(word);
+            if(!$scope.emptyQuery){
+                $scope.searchMessage = "Song contains: " + word;
+            }
+            else{
+                $scope.searchMessage = "";
+            }
             $scope.track_data.forEach(function(track_data_element){
                var particular_track = $scope.tracks.find(function(elt){
                    return track_data_element.uri === elt.track.uri;
@@ -235,7 +246,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                track_data_element.isHidden = !((new RegExp(word,'i')).test(strings_compressed));
             });
 
-            console.log($scope.track_data);
+            //console.log($scope.track_data);
         };
 
 /********************************************************************************************************************/
@@ -259,7 +270,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
         angular.element($window).bind('resize', resizeWordsCloud);
 
         $scope.startWordCloud = function () {
-            console.log("generating a word cloud");
+            //console.log("generating a word cloud");
             var data = {
                 username: $scope.display_name
 
@@ -275,7 +286,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                     generateWords();
 
                 }, function error(response) {
-                    console.log("error when loading the word cloud");
+                    //console.log("error when loading the word cloud");
                 });
         }
 
@@ -300,9 +311,9 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
         }
 
         function generateWords() {
-            console.log("Displaying words onto the word cloud");
+            //console.log("Displaying words onto the word cloud");
             var wordsMap = $scope.wordsMap;
-            console.log(wordsMap);
+            //console.log(wordsMap);
             originWords = Object.keys(wordsMap).map(function (key) {
                 return {
                     text: key,
@@ -364,7 +375,7 @@ angular.module('frontApp.view2', ['ngRoute', 'angular-d3-word-cloud'])
                 $scope.playlist_builder.push(newThing);
             $scope.$apply();
 
-            console.log($scope.playlist_builder);
+            //console.log($scope.playlist_builder);
         }
 
 
